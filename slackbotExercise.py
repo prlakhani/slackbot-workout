@@ -124,7 +124,10 @@ def fetchActiveUsers(bot):
     params = {"token": USER_TOKEN_STRING, "channel": bot.channel_id}
     response = requests.get("https://slack.com/api/channels.info", params=params)
     user_ids = json.loads(response.text, encoding='utf-8')["channel"]["members"]
-
+    # exclude Nicole, Brandon, Kagrama, and Kent
+    excluded_users = [u'U04N24PNB',u'U04TNBREC',u'U0G9TC4G5',u'U03PGU7NV']
+    user_ids = [uid for uid in user_ids 
+            if uid not in excluded_users]
     active_users = []
 
     for user_id in user_ids:
