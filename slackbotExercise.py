@@ -8,6 +8,7 @@ from random import shuffle
 import pickle
 import os.path
 import datetime
+import pytz
 import fetchChannelId as fci
 
 from User import User
@@ -64,6 +65,7 @@ class Bot:
             # self.channel_id = settings["channelId"]
             self.channel_id = fci.fetch_id(settings["channelName"])
             self.exercises = settings["exercises"]
+            self.timezone = pytz.timezone(settings["timezone"])
             self.office_hours_on = settings["officeHours"]["on"]
             self.office_hours_begin = settings["officeHours"]["begin"]
             self.office_hours_end = settings["officeHours"]["end"]
@@ -151,7 +153,7 @@ period has past.
 '''
 def selectExerciseAndStartTime(bot):
     next_time_interval = selectNextTimeInterval(bot)
-    minute_interval = next_time_interval/60
+    minute_interval = next_time_interval//60
     exercise = selectExercise(bot)
 
     # Announcement String of next lottery time
@@ -198,7 +200,7 @@ def assignExercise(bot, exercise):
 
     # EVERYBODY
     if random.random() < bot.group_callout_chance:
-        winner_announcement = "@channel" + winner_announcement
+        winner_announcement = "@channel " + winner_announcement
 
         for user_id in bot.user_cache:
             user = bot.user_cache[user_id]
@@ -210,7 +212,7 @@ def assignExercise(bot, exercise):
         winners = [selectUser(bot, exercise) for i in range(bot.num_people_per_callout)]
         winner_list = ('Captain ' if len(winners)==1 else 'Captains ')
         for i in range(bot.num_people_per_callout):
-            winner_list += str(winners[i].getUserHandle())
+            winner_list += str(winners[i].getUserHandle().decode())  # remove b'
             # winner_announcement = str(winners[i].getUserHandle()) + winner_announcement
             if i == bot.num_people_per_callout - 2:
                 winner_list += ", and "
@@ -273,7 +275,7 @@ def isOfficeHours(bot):
         if bot.debug:
             print("not office hours")
         return True
-    now = datetime.datetime.now()
+    now = datetime.datetime.now(bot.timezone)
     # print(now)
     now_hour = now.hour
     if now_hour >= bot.office_hours_begin and now_hour < bot.office_hours_end:

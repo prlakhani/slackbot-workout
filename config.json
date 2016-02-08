@@ -7,7 +7,7 @@
     "begin": 9,
     "end": 19
    },
-
+  "timezone": "US/Pacific",
   "debug": true,
 
   "callouts": {
