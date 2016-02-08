@@ -8,7 +8,7 @@
     "end": 19
    },
   "timezone": "US/Pacific",
-  "debug": true,
+  "debug": false,
 
   "callouts": {
     "timeBetween": {
