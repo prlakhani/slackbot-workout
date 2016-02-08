@@ -8,6 +8,7 @@ from random import shuffle
 import pickle
 import os.path
 import datetime
+import fetchChannelId as fci
 
 from User import User
 
@@ -60,7 +61,8 @@ class Bot:
             self.num_people_per_callout = settings["callouts"]["numPeople"]
             self.sliding_window_size = settings["callouts"]["slidingWindowSize"]
             self.group_callout_chance = settings["callouts"]["groupCalloutChance"]
-            self.channel_id = settings["channelId"]
+            # self.channel_id = settings["channelId"]
+            self.channel_id = fci.fetch_id(settings["channelName"])
             self.exercises = settings["exercises"]
             self.office_hours_on = settings["officeHours"]["on"]
             self.office_hours_begin = settings["officeHours"]["begin"]
@@ -124,8 +126,7 @@ def fetchActiveUsers(bot):
     params = {"token": USER_TOKEN_STRING, "channel": bot.channel_id}
     response = requests.get("https://slack.com/api/channels.info", params=params)
     user_ids = json.loads(response.text, encoding='utf-8')["channel"]["members"]
-    user_ids = [uid for uid in user_ids 
-            if uid not in bot.excluded_users]
+    user_ids = [uid for uid in user_ids if uid not in bot.excluded_users]
     active_users = []
 
     for user_id in user_ids:
