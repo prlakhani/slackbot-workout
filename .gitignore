@@ -1,4 +1,4 @@
-config.json
+*.sw*
 *.pyc
 
 log*.csv
