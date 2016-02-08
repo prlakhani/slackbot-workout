@@ -38,5 +38,5 @@ if __name__ == "__main__":
     searchChannel = sys.argv[1]
     for channel in channels:
         if channel["name"] == searchChannel:
-            print channel["id"]
+            print(channel["id"])
             break

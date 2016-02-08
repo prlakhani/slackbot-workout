@@ -39,7 +39,7 @@ class Bot:
         if os.path.isfile('user_cache.save'):
             with open('user_cache.save','rb') as f:
                 self.user_cache = pickle.load(f)
-                print "Loading " + str(len(self.user_cache)) + " users from cache."
+                print("Loading " + str(len(self.user_cache)) + " users from cache.")
                 return self.user_cache
 
         return {}
@@ -114,7 +114,7 @@ def selectUser(bot, exercise):
             return user
 
     # If we weren't able to select one, just pick a random
-    print "Selecting user at random (queue length was " + str(len(bot.user_queue)) + ")"
+    print("Selecting user at random (queue length was " + str(len(bot.user_queue)) + ")")
     return active_users[random.randrange(0, len(active_users))]
 
 
@@ -160,7 +160,7 @@ def selectExerciseAndStartTime(bot):
     # Announce the exercise to the thread
     if not bot.debug:
         requests.post(bot.post_URL, data=lottery_announcement)
-    print lottery_announcement
+    print(lottery_announcement)
 
     # Sleep the script until time is up
     if not bot.debug:
@@ -226,7 +226,7 @@ def assignExercise(bot, exercise):
     # Announce the user
     if not bot.debug:
         requests.post(bot.post_URL, data=winner_announcement)
-    print winner_announcement
+    print(winner_announcement)
 
 
 def logExercise(bot,username,exercise,reps,units):
@@ -261,7 +261,7 @@ def saveUsers(bot):
 
     if not bot.debug:
         requests.post(bot.post_URL, data=s)
-    print s
+    print(s)
 
 
     # write to file
@@ -271,18 +271,18 @@ def saveUsers(bot):
 def isOfficeHours(bot):
     if not bot.office_hours_on:
         if bot.debug:
-            print "not office hours"
+            print("not office hours")
         return True
     now = datetime.datetime.now()
     # print(now)
     now_hour = now.hour
     if now_hour >= bot.office_hours_begin and now_hour < bot.office_hours_end:
         if bot.debug:
-            print "in office hours"
+            print("in office hours")
         return True
     else:
         if bot.debug:
-            print "out office hours"
+            print("out office hours")
         return False
 
 def main():
