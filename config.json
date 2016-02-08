@@ -8,7 +8,7 @@
     "end": 19
    },
 
-  "debug": false,
+  "debug": true,
 
   "callouts": {
     "timeBetween": {
