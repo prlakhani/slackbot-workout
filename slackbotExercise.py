@@ -65,7 +65,7 @@ class Bot:
             self.office_hours_on = settings["officeHours"]["on"]
             self.office_hours_begin = settings["officeHours"]["begin"]
             self.office_hours_end = settings["officeHours"]["end"]
-
+            self.excluded_users = settings["excludedUsers"]
             self.debug = settings["debug"]
 
         self.post_URL = "https://" + self.team_domain + ".slack.com/services/hooks/slackbot?token=" + URL_TOKEN_STRING + "&channel=" + HASH + self.channel_name
@@ -124,10 +124,8 @@ def fetchActiveUsers(bot):
     params = {"token": USER_TOKEN_STRING, "channel": bot.channel_id}
     response = requests.get("https://slack.com/api/channels.info", params=params)
     user_ids = json.loads(response.text, encoding='utf-8')["channel"]["members"]
-    # exclude Nicole, Brandon, Kagrama, and Kent
-    excluded_users = [u'U04N24PNB',u'U04TNBREC',u'U0G9TC4G5',u'U03PGU7NV']
     user_ids = [uid for uid in user_ids 
-            if uid not in excluded_users]
+            if uid not in bot.excluded_users]
     active_users = []
 
     for user_id in user_ids:
@@ -156,7 +154,7 @@ def selectExerciseAndStartTime(bot):
     exercise = selectExercise(bot)
 
     # Announcement String of next lottery time
-    lottery_announcement = "NEXT LOTTERY FOR " + exercise["name"].upper() + " IS IN " + str(minute_interval) + (" MINUTES" if minute_interval != 1 else " MINUTE")
+    lottery_announcement = "Hey guys, next lottery for " + exercise["name"] + " is in " + str(minute_interval) + (" minutes" if minute_interval != 1 else " minute")
 
     # Announce the exercise to the thread
     if not bot.debug:
@@ -195,11 +193,11 @@ def assignExercise(bot, exercise):
     # Select number of reps
     exercise_reps = random.randrange(exercise["minReps"], exercise["maxReps"]+1)
 
-    winner_announcement = str(exercise_reps) + " " + str(exercise["units"]) + " " + exercise["name"] + " RIGHT NOW "
+    winner_announcement = "I think you'd feel a lot better if you did " + str(exercise_reps) + " " + str(exercise["units"]) + " " + exercise["name"] + " ;)"
 
     # EVERYBODY
     if random.random() < bot.group_callout_chance:
-        winner_announcement += "@channel!"
+        winner_announcement = "@channel" + winner_announcement
 
         for user_id in bot.user_cache:
             user = bot.user_cache[user_id]
@@ -209,19 +207,21 @@ def assignExercise(bot, exercise):
 
     else:
         winners = [selectUser(bot, exercise) for i in range(bot.num_people_per_callout)]
-
+        winner_list = ('Captain ' if len(winners)==1 else 'Captains ')
         for i in range(bot.num_people_per_callout):
-            winner_announcement += str(winners[i].getUserHandle())
+            winner_list += str(winners[i].getUserHandle())
+            # winner_announcement = str(winners[i].getUserHandle()) + winner_announcement
             if i == bot.num_people_per_callout - 2:
-                winner_announcement += ", and "
+                winner_list += ", and "
             elif i == bot.num_people_per_callout - 1:
-                winner_announcement += "!"
+                winner_list += ": "
             else:
-                winner_announcement += ", "
+                winner_list += ", "
 
             winners[i].addExercise(exercise, exercise_reps)
             logExercise(bot,winners[i].getUserHandle(),exercise["name"],exercise_reps,exercise["units"])
-
+         
+        winner_announcement = winner_list + winner_announcement
     # Announce the user
     if not bot.debug:
         requests.post(bot.post_URL, data=winner_announcement)
@@ -273,8 +273,9 @@ def isOfficeHours(bot):
             print "not office hours"
         return True
     now = datetime.datetime.now()
-    now_time = now.time()
-    if now_time >= datetime.time(bot.office_hours_begin) and now_time <= datetime.time(bot.office_hours_end):
+    # print(now)
+    now_hour = now.hour
+    if now_hour >= bot.office_hours_begin and now_hour < bot.office_hours_end:
         if bot.debug:
             print "in office hours"
         return True
