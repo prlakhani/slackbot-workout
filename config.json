@@ -12,8 +12,8 @@
 
   "callouts": {
     "timeBetween": {
-      "minTime": 1,
-      "maxTime": 2,
+      "minTime": 18,
+      "maxTime": 28,
       "units": "minutes"
     },
     "numPeople": 1,
@@ -34,14 +34,14 @@
       "name": "planks",
       "minReps": 40,
       "maxReps": 60,
-      "units": "second"
+      "units": "seconds"
     },
     {
       "id": 2,
       "name": "wall sit",
       "minReps": 40,
       "maxReps": 50,
-      "units": "second"
+      "units": "seconds"
     },
     {
       "id": 3,
