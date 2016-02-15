@@ -69,6 +69,7 @@ class Bot:
             self.office_hours_on = settings["officeHours"]["on"]
             self.office_hours_begin = settings["officeHours"]["begin"]
             self.office_hours_end = settings["officeHours"]["end"]
+            self.no_weekends = settings["officeHours"]["noWeekends"]
             self.excluded_users = settings["excludedUsers"]
             self.debug = settings["debug"]
 
@@ -200,13 +201,13 @@ def assignExercise(bot, exercise):
 
     # EVERYBODY
     if random.random() < bot.group_callout_chance:
-        winner_announcement = "@channel " + winner_announcement
+        winner_announcement = "@here " + winner_announcement
 
         for user_id in bot.user_cache:
             user = bot.user_cache[user_id]
             user.addExercise(exercise, exercise_reps)
 
-        logExercise(bot,"@channel",exercise["name"],exercise_reps,exercise["units"])
+        logExercise(bot,"@here",exercise["name"],exercise_reps,exercise["units"])
 
     else:
         winners = [selectUser(bot, exercise) for i in range(bot.num_people_per_callout)]
@@ -278,14 +279,19 @@ def isOfficeHours(bot):
     now = datetime.datetime.now(bot.timezone)
     # print(now)
     now_hour = now.hour
-    if now_hour >= bot.office_hours_begin and now_hour < bot.office_hours_end:
+    if bot.no_weekends and now.weekday() > 4:
         if bot.debug:
-            print("in office hours")
-        return True
-    else:
-        if bot.debug:
-            print("out office hours")
+            print("weekend -- out office hours")
         return False
+    else:
+        if now.hour >= bot.office_hours_begin and now_hour < bot.office_hours_end:
+            if bot.debug:
+                print("in office hours")
+            return True
+        else:
+            if bot.debug:
+                print("out office hours")
+            return False
 
 def main():
     bot = Bot()

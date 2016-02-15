@@ -5,7 +5,8 @@
   "officeHours": {
     "on": true,
     "begin": 9,
-    "end": 19
+    "end": 19,
+    "noWeekends": true
    },
   "timezone": "US/Pacific",
   "debug": false,
